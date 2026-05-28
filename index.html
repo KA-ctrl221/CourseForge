@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CourseForge — Bento Learning Platform</title>
+  <style>
+    :root {
+      --white: #FFFFFF;
+      --mint-light: #D0F5E8;
+      --mint-medium: #A8EDD0;
+      --mint-accent: #4DC99A;
+      --purple-light: #E8D8FF;
+      --purple-medium: #CCB0F5;
+      --purple-accent: #8B5CF6;
+      --bg: #F4FDF8;
+      --card: #FFFFFF;
+      --text: #1A1A2E;
+      --text-mid: #4A4A6A;
+      --text-light: #8888AA;
+      --danger: #EF4444;
+      --danger-light: #FEE2E2;
+      --warning: #F59E0B;
+      --warning-light: #FEF3C7;
+      --success: #10B981;
+      --success-light: #D1FAE5;
+      --border: #E8F4EE;
+      --shadow: 0 2px 12px rgba(0,0,0,0.06);
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+    /* ── Sidebar ── */
+    .sidebar { width: 228px; background: var(--white); border-right: 1px solid var(--border); padding: 22px 0 16px; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; box-shadow: 2px 0 20px rgba(0,0,0,0.04); }
+    .logo { padding: 0 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+    .logo-text { font-size: 22px; font-weight: 900; background: linear-gradient(135deg, var(--mint-accent), var(--purple-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.5px; }
+    .logo-sub { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+    .mode-toggle { margin: 0 12px 14px; background: var(--bg); border-radius: 10px; padding: 4px; display: flex; gap: 2px; }
+    .mode-btn { flex: 1; padding: 7px 6px; border: none; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text-light); }
+    .mode-btn.active-s { background: var(--mint-medium); color: #145c3a; }
+    .mode-btn.active-t { background: var(--purple-medium); color: #3a1a6c; }
+    .nav-link { display: flex; align-items: center; gap: 10px; padding: 9px 18px; cursor: pointer; transition: all 0.15s; border-radius: 10px; margin: 1px 8px; font-size: 13.5px; font-weight: 500; color: var(--text-mid); }
+    .nav-link:hover { background: var(--mint-light); color: var(--text); }
+    .nav-link.active { background: linear-gradient(135deg, var(--mint-light), var(--purple-light)); color: var(--text); font-weight: 700; }
+    .nav-icon { font-size: 17px; width: 22px; text-align: center; }
+    .nav-section-label { padding: 10px 20px 4px; font-size: 10.5px; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.8px; }
+    .sidebar-class { display: flex; align-items: center; gap: 9px; padding: 7px 18px; border-radius: 9px; margin: 1px 8px; cursor: pointer; font-size: 13px; color: var(--text-mid); transition: all 0.15s; }
+    .sidebar-class:hover { background: var(--mint-light); }
+    .sidebar-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .sidebar-bottom { margin-top: auto; padding: 14px; border-top: 1px solid var(--border); }
+    .user-info { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; background: var(--bg); cursor: pointer; transition: all 0.15s; }
+    .user-info:hover { background: var(--mint-light); }
+    .user-avatar-small { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--mint-accent), var(--purple-accent)); display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+    .edit-name-hint { font-size: 10px; color: var(--text-light); margin-top: 1px; }
+
+    /* ── Main ── */
+    .main { margin-left: 228px; flex: 1; padding: 26px 28px; min-height: 100vh; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .page-title { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; }
+    .page-sub { font-size: 13px; color: var(--text-light); margin-top: 3px; }
+    .page-header { margin-bottom: 22px; }
+
+    /* ── Cards ── */
+    .card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+    .card-title { font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-light); margin-bottom: 14px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+
+    /* ── Stat cards ── */
+    .stat-label { font-size: 11.5px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 40px; font-weight: 900; line-height: 1.1; margin: 5px 0 4px; letter-spacing: -1px; }
+    .stat-sub { font-size: 13px; color: var(--text-mid); }
+
+    /* ── Progress ── */
+    .progress-bar { width: 100%; height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 7px 0; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+
+    /* ── Badges ── */
+    .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 700; }
+    .b-success { background: var(--success-light); color: #065f46; }
+    .b-danger { background: var(--danger-light); color: #991b1b; }
+    .b-warning { background: var(--warning-light); color: #92400e; }
+    .b-mint { background: var(--mint-light); color: #145c3a; }
+    .b-purple { background: var(--purple-light); color: #4c1d95; }
+    .b-submitted { background: #DBEAFE; color: #1e40af; }
+    .dot-submitted { background: #3b82f6; }
+
+    /* ── Buttons ── */
+    .btn { padding: 9px 18px; border: none; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+    .btn-primary { background: linear-gradient(135deg, var(--mint-accent), var(--purple-accent)); color: white; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(75,200,154,0.35); }
+    .btn-secondary { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
+    .btn-danger { background: var(--danger-light); color: var(--danger); border: 1.5px solid #fca5a5; }
+    .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 9px; }
+
+    /* ── Assignment items ── */
+    .assign-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 10px; cursor: pointer; transition: all 0.15s; border: 1.5px solid transparent; }
+    .assign-item:hover { background: var(--bg); border-color: var(--border); }
+    .assign-item.missing { background: var(--danger-light); border-color: #fca5a5; }
+    .assign-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .dot-completed { background: var(--success); }
+    .dot-upcoming { background: var(--warning); }
+    .dot-missing { background: var(--danger); }
+    .assign-name { flex: 1; font-size: 13.5px; font-weight: 600; }
+    .assign-meta { font-size: 11.5px; color: var(--text-light); margin-top: 2px; }
+
+    /* ── Class rows ── */
+    .class-row { display: flex; align-items: center; padding: 13px 12px; border-radius: 11px; cursor: pointer; transition: all 0.15s; border: 1.5px solid transparent; gap: 13px; }
+    .class-row:hover { background: linear-gradient(135deg, var(--mint-light), var(--purple-light)); border-color: var(--mint-medium); }
+    .class-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
+
+    /* ── Streak dots ── */
+    .streak-days { display: flex; gap: 5px; margin-top: 11px; }
+    .streak-day { flex: 1; text-align: center; }
+    .streak-day-lbl { font-size: 9.5px; color: var(--text-light); margin-bottom: 4px; font-weight: 600; }
+    .streak-dot { width: 26px; height: 26px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+    .sd-done { background: linear-gradient(135deg, var(--mint-accent), var(--purple-accent)); color: white; }
+    .sd-today { border: 2.5px solid var(--mint-accent); background: var(--mint-light); color: var(--mint-accent); }
+    .sd-future { background: transparent; border: 1.5px dashed var(--border); }
+
+    /* ── Units ── */
+    .unit-item { border: 1.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; transition: all 0.2s; }
+    .unit-header { display: flex; align-items: center; padding: 14px 16px; cursor: pointer; background: var(--white); transition: background 0.15s; }
+    .unit-header:hover { background: var(--mint-light); }
+
+    /* ── Tables ── */
+    .grades-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .grades-table th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); border-bottom: 2px solid var(--border); }
+    .grades-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    .grades-table tr:hover td { background: var(--bg); cursor: pointer; }
+    .grades-table .miss-row td { background: var(--danger-light) !important; }
+
+    /* ── Forms ── */
+    .input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13.5px; background: var(--white); color: var(--text); outline: none; transition: border-color 0.15s; font-family: inherit; }
+    .input:focus { border-color: var(--mint-accent); }
+    .textarea { resize: vertical; min-height: 96px; }
+    .form-label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-bottom: 6px; }
+    .form-group { margin-bottom: 15px; }
+
+    /* ── Planner ── */
+    .planner-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 11px; }
+    .planner-day { background: var(--white); border-radius: var(--radius-sm); border: 1.5px solid var(--border); overflow: hidden; }
+    .planner-day-head { padding: 9px 10px; font-size: 11.5px; font-weight: 800; text-align: center; background: linear-gradient(135deg, var(--mint-light), var(--purple-light)); }
+    .planner-day.today-day .planner-day-head { background: linear-gradient(135deg, var(--mint-accent), var(--purple-accent)); color: white; }
+    .planner-body { padding: 8px; min-height: 90px; }
+    .planner-pill { display: flex; align-items: flex-start; gap: 6px; padding: 5px 7px; border-radius: 7px; margin-bottom: 4px; font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .planner-pill:hover { opacity: 0.8; }
+    .planner-cb { width: 13px; height: 13px; border-radius: 3px; border: 2px solid rgba(0,0,0,0.2); flex-shrink: 0; margin-top: 1px; transition: all 0.15s; display: flex; align-items: center; justify-content: center; color: white; font-size: 9px; }
+    .planner-cb.chk { background: var(--mint-accent); border-color: var(--mint-accent); }
+
+    /* ── AI Chat ── */
+    .chat-wrap { display: flex; flex-direction: column; height: calc(100vh - 148px); min-height: 400px; }
+    .chat-msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .chat-msg { display: flex; gap: 11px; max-width: 82%; }
+    .chat-msg.ai-msg { align-self: flex-start; }
+    .chat-msg.user-msg { flex-direction: row-reverse; align-self: flex-end; }
+    .chat-av { width: 33px; height: 33px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .av-ai { background: linear-gradient(135deg, var(--mint-accent), var(--purple-accent)); }
+    .av-user { background: var(--purple-light); }
+    .chat-bubble { padding: 12px 16px; border-radius: 16px; font-size: 13.5px; line-height: 1.55; }
+    .ai-msg .chat-bubble { background: var(--white); border: 1.5px solid var(--border); border-bottom-left-radius: 4px; }
+    .user-msg .chat-bubble { background: linear-gradient(135deg, var(--mint-accent), var(--purple-accent)); color: white; border-bottom-right-radius: 4px; }
+    .chat-input-row { padding: 16px 18px; background: var(--white); border-top: 1.5px solid var(--border); display: flex; gap: 10px; }
+    .chat-inp { flex: 1; padding: 10px 16px; border: 1.5px solid var(--border); border-radius: 24px; font-size: 13.5px; outline: none; font-family: inherit; transition: border-color 0.15s; }
+    .chat-inp:focus { border-color: var(--mint-accent); }
+    .chat-send { width: 40px; height: 40px; border: none; border-radius: 50%; background: linear-gradient(135deg, var(--mint-accent), var(--purple-accent)); color: white; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+    .chat-send:hover { transform: scale(1.05); }
+    .t-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-light); animation: bounce 1.4s infinite; }
+    .t-dot:nth-child(2) { animation-delay: 0.2s; }
+    .t-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-7px); } }
+    .chat-example-label { font-size: 11px; color: var(--text-light); font-style: italic; margin-top: 2px; padding: 0 44px; }
+
+    /* ── Empty states ── */
+    .empty-state { text-align: center; padding: 32px 20px; color: var(--text-light); }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-title { font-size: 15px; font-weight: 700; color: var(--text-mid); margin-bottom: 6px; }
+    .empty-sub { font-size: 13px; line-height: 1.5; margin-bottom: 16px; }
+
+    /* ── Back button ── */
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; background: var(--white); border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text-mid); margin-bottom: 20px; transition: all 0.15s; }
+    .back-btn:hover { background: var(--mint-light); border-color: var(--mint-accent); }
+
+    /* ── Tabs ── */
+    .tab-list { display: flex; gap: 3px; background: var(--bg); padding: 4px; border-radius: 10px; width: fit-content; }
+    .tab-btn { padding: 7px 16px; border: none; border-radius: 7px; font-size: 12.5px; font-weight: 700; cursor: pointer; background: transparent; color: var(--text-light); transition: all 0.15s; font-family: inherit; }
+    .tab-btn.active { background: var(--white); color: var(--text); box-shadow: var(--shadow); }
+
+    /* ── Modal ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.28); z-index: 200; backdrop-filter: blur(5px); }
+    .modal-box { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: white; border-radius: var(--radius); padding: 28px; width: 420px; z-index: 201; box-shadow: 0 8px 50px rgba(0,0,0,0.18); }
+    .modal-title { font-size: 20px; font-weight: 900; margin-bottom: 20px; }
+
+    /* ── Notification ── */
+    .notif { position: fixed; bottom: 24px; right: 26px; background: var(--text); color: white; padding: 12px 20px; border-radius: 12px; font-size: 13.5px; font-weight: 600; box-shadow: 0 4px 24px rgba(0,0,0,0.22); z-index: 999; animation: slideUp 0.3s ease; display: none; }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* ── Summary grid ── */
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .summary-item { background: var(--bg); border-radius: 10px; padding: 13px; text-align: center; }
+    .summary-num { font-size: 30px; font-weight: 900; letter-spacing: -1px; }
+    .summary-lbl { font-size: 11px; color: var(--text-light); font-weight: 700; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.4px; }
+
+    /* ── Attachment zone ── */
+    .attach-zone { border: 2px dashed var(--border); border-radius: 10px; padding: 20px; text-align: center; color: var(--text-light); font-size: 13px; cursor: pointer; transition: all 0.15s; }
+    .attach-zone:hover { border-color: var(--mint-accent); background: var(--mint-light); color: var(--mint-accent); }
+
+    /* ── Drag & Drop ── */
+    .drag-handle { font-size: 15px; color: var(--border); cursor: grab; padding: 0 4px; flex-shrink: 0; user-select: none; transition: color 0.15s; line-height: 1; }
+    .class-row:hover .drag-handle,
+    .unit-header:hover .drag-handle,
+    .assign-item:hover .drag-handle,
+    .sidebar-class:hover .drag-handle { color: var(--text-light); }
+    .drag-over { outline: 2px dashed var(--mint-accent) !important; outline-offset: 2px; background: var(--mint-light) !important; border-radius: var(--radius-sm); }
+    .dragging { opacity: 0.35 !important; transform: scale(0.97); transition: none; }
+    [draggable="true"] { cursor: grab; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Grid helpers ── */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .g21 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+    .mb16 { margin-bottom: 16px; }
+    .divider { height: 1px; background: var(--border); margin: 12px 0; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════ SIDEBAR ═══════ -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-text">CourseForge</div>
+    <div class="logo-sub">Bento Learning Platform</div>
+  </div>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active-s" id="btnStudent" onclick="setMode('student')">Student</button>
+    <button class="mode-btn" id="btnTeacher" onclick="setMode('teacher')">Teacher</button>
+  </div>
+
+  <a class="nav-link active" id="nl-dashboard" onclick="showView('dashboard')"><span class="nav-icon">🏠</span>Dashboard</a>
+  <a class="nav-link" id="nl-grades" onclick="showView('grades')"><span class="nav-icon">📊</span>Grades</a>
+  <a class="nav-link" id="nl-planner" onclick="showView('planner')"><span class="nav-icon">📅</span>Planner</a>
+  <a class="nav-link" id="nl-chat" onclick="showView('chat')"><span class="nav-icon">🤖</span>AI Tutor</a>
+
+  <div class="nav-section-label">Classes</div>
+  <div id="sidebarClasses"></div>
+
+  <div class="sidebar-bottom">
+    <div class="user-info" onclick="showEditNameModal()" title="Click to edit your name">
+      <div class="user-avatar-small" id="sidebarAvatar">?</div>
+      <div style="flex:1; min-width:0">
+        <div style="font-size: 13px; font-weight: 700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis" id="sidebarName">Set your name</div>
+        <div class="edit-name-hint" id="sidebarRole">Click to edit · Student Mode</div>
+      </div>
+      <div style="font-size:14px; color:var(--text-light); flex-shrink:0">✏️</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════ MAIN ═══════ -->
+<main class="main">
+
+  <!-- ── DASHBOARD ── -->
+  <div class="view active" id="view-dashboard">
+    <div class="page-header">
+      <div class="page-title" id="dashGreeting">Welcome to LearnFlow 👋</div>
+      <div class="page-sub" id="dashDate"></div>
+    </div>
+
+    <div class="g3 mb16">
+      <div class="card" style="background: linear-gradient(145deg, #E8FBF2, #F0E6FF);">
+        <div class="stat-label">Overall Grade</div>
+        <div class="stat-value" id="overallGrade" style="background: linear-gradient(135deg, var(--mint-accent), var(--purple-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">—</div>
+        <div class="stat-sub" id="overallSub">No classes yet</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">Current Streak 🔥</div>
+        <div class="stat-value" id="streakVal" style="color: var(--warning);">0</div>
+        <div class="stat-sub">days in a row</div>
+        <div class="streak-days" id="streakDays"></div>
+      </div>
+      <div class="card">
+        <div class="stat-label">Status</div>
+        <div style="font-size: 22px; font-weight: 900; margin: 5px 0 4px;" id="statusVal">—</div>
+        <div class="stat-sub" id="statusSub">Add classes to get started</div>
+        <div style="margin-top: 11px; display: flex; flex-direction: column; gap: 5px;" id="missingAlerts"></div>
+      </div>
+    </div>
+
+    <div class="g2 mb16">
+      <div class="card">
+        <div class="section-header">
+          <div class="card-title" style="margin-bottom:0">My Classes</div>
+          <button class="btn btn-primary btn-sm" id="addClassBtn" onclick="showAddClassModal()" style="display:none">+ Add Class</button>
+        </div>
+        <div id="classesList"></div>
+      </div>
+      <div class="card">
+        <div class="tab-list mb16">
+          <button class="tab-btn active" onclick="switchAssignTab('upcoming',this)">Upcoming</button>
+          <button class="tab-btn" onclick="switchAssignTab('missing',this)">Missing</button>
+        </div>
+        <div id="upcomingList"></div>
+        <div id="missingList" style="display:none"></div>
+      </div>
+    </div>
+
+    <div class="g21">
+      <div class="card">
+        <div class="card-title">Course Progress</div>
+        <div id="progressBars"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Weekly Summary</div>
+        <div class="summary-grid" id="weeklySummary"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── COURSE PAGE ── -->
+  <div class="view" id="view-course">
+    <button class="back-btn" onclick="showView('dashboard')">← Dashboard</button>
+    <div id="coursePage"></div>
+  </div>
+
+  <!-- ── UNIT PAGE ── -->
+  <div class="view" id="view-unit">
+    <button class="back-btn" id="unitBackBtn">← Back to Course</button>
+    <div id="unitPage"></div>
+  </div>
+
+  <!-- ── ASSIGNMENT PAGE ── -->
+  <div class="view" id="view-assignment">
+    <button class="back-btn" id="assignBackBtn">← Back</button>
+    <div id="assignPage"></div>
+  </div>
+
+  <!-- ── GRADES ── -->
+  <div class="view" id="view-grades">
+    <div class="page-header">
+      <div class="page-title">📊 Grades</div>
+      <div class="page-sub">Your full performance record</div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;" id="gradeFilters"></div>
+    <div class="g21">
+      <div class="card">
+        <div class="card-title">All Assignments</div>
+        <table class="grades-table">
+          <thead><tr><th>Assignment</th><th>Class</th><th>Category</th><th>Status</th><th>Points</th></tr></thead>
+          <tbody id="gradesBody"></tbody>
+        </table>
+        <div id="gradesEmpty"></div>
+      </div>
+      <div>
+        <div class="card mb16">
+          <div class="card-title">By Category</div>
+          <div id="catBreakdown"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Class Grades</div>
+          <div id="gpaBreakdown"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLANNER ── -->
+  <div class="view" id="view-planner">
+    <div class="page-header">
+      <div class="page-title">📅 Weekly Planner</div>
+      <div class="page-sub" id="plannerWeekLabel"></div>
+    </div>
+    <div class="planner-grid" id="plannerGrid"></div>
+  </div>
+
+  <!-- ── AI CHAT ── -->
+  <div class="view" id="view-chat">
+    <div class="page-header">
+      <div class="page-title">🤖 AI Tutor</div>
+      <div class="page-sub">Ask anything — grades, assignments, planning, accountability</div>
+    </div>
+    <div class="card chat-wrap" style="padding:0; overflow:hidden;">
+      <div class="chat-msgs" id="chatMsgs"></div>
+      <div class="chat-input-row">
+        <input class="chat-inp" id="chatInp" placeholder="Ask about your grades, missing work, schedule..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="chat-send" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════ MODAL ═══════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+<div class="modal-box" id="modalBox">
+  <div id="modalContent"></div>
+</div>
+
+<!-- ═══════ NOTIFICATION ═══════ -->
+<div class="notif" id="notif"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA — loaded from SQLite via Flask API
+// ═══════════════════════════════════════════
+let COURSES = [];
+
+// ═══════════════════════════════════════════
+// API HELPER
+// ═══════════════════════════════════════════
+function api(method, path, body) {
+  return fetch('/api' + path, {
+    method,
+    headers: body ? { 'Content-Type': 'application/json' } : {},
+    body: body ? JSON.stringify(body) : undefined,
+  }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .catch(err => { console.error('API error', err); notify('⚠ Database error — check server'); });
+}
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const S = {
+  mode: 'student',
+  view: 'dashboard',
+  name: '',
+  courseId: null,
+  unitId: null,
+  assignId: null,
+  gradeFilter: 'all',
+  plannerDone: {},
+  chatInit: false,
+  prevView: 'dashboard',
+};
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function fmtDate(d) {
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric' });
+}
+function letterGrade(p) {
+  if(p>=97)return'A+'; if(p>=93)return'A'; if(p>=90)return'A-';
+  if(p>=87)return'B+'; if(p>=83)return'B'; if(p>=80)return'B-';
+  if(p>=77)return'C+'; if(p>=73)return'C'; if(p>=70)return'C-';
+  if(p>=67)return'D+'; if(p>=63)return'D'; return'F';
+}
+function allAssignments() {
+  const arr = [];
+  COURSES.forEach(c => c.units.forEach(u => u.assignments.forEach(a =>
+    arr.push({...a, courseId:c.id, courseName:c.name, courseAccent:c.accent, courseEmoji:c.emoji, unitId:u.id})
+  )));
+  return arr;
+}
+function getCourse(id) { return COURSES.find(c=>c.id===id); }
+function getUnit(cid, uid) { return getCourse(cid)?.units.find(u=>u.id===uid); }
+function getAssign(cid, uid, aid) { return getUnit(cid,uid)?.assignments.find(a=>a.id===aid); }
+function notify(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg; el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.style.display = 'none', 3000);
+}
+function statusClass(s) {
+  if(s==='completed') return 'b-success';
+  if(s==='missing') return 'b-danger';
+  if(s==='submitted') return 'b-submitted';
+  return 'b-warning';
+}
+function dotClass(s) {
+  if(s==='completed') return 'dot-completed';
+  if(s==='missing') return 'dot-missing';
+  if(s==='submitted') return 'dot-submitted';
+  return 'dot-upcoming';
+}
+function greeting() {
+  const h = new Date().getHours();
+  if(h < 12) return 'Good morning';
+  if(h < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+function todayStr() {
+  return new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function showView(view, cid, uid, aid) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  const nl = document.getElementById('nl-' + view);
+  if(nl) nl.classList.add('active');
+  S.prevView = S.view;
+  S.view = view;
+  if(cid !== undefined) S.courseId = cid;
+  if(uid !== undefined) S.unitId = uid;
+  if(aid !== undefined) S.assignId = aid;
+  if(view === 'course') { renderCoursePage(); const c2 = getCourse(S.courseId); if(c2) initUnitsDrag(c2); }
+  if(view === 'unit') { renderUnitPage(); const cu = getCourse(S.courseId); const uu = getUnit(S.courseId, S.unitId); if(cu && uu) initAssignDrag(uu, cu); }
+  if(view === 'assignment') renderAssignPage();
+  if(view === 'grades') renderGrades();
+  if(view === 'planner') renderPlanner();
+  if(view === 'chat' && !S.chatInit) { renderChat(); S.chatInit = true; }
+  window.scrollTo(0,0);
+}
+
+function openAssign(cid, uid, aid) {
+  S.courseId = cid; S.unitId = uid; S.assignId = aid;
+  document.getElementById('assignBackBtn').onclick = () => showView(S.prevView || 'unit');
+  showView('assignment');
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+async function loadData() {
+  try {
+    const data = await fetch('/api/data').then(r => r.json());
+    // Map DB columns (category, description) → JS fields (cat, desc)
+    COURSES = (data.courses || []).map(c => ({
+      id: c.id, name: c.name, emoji: c.emoji,
+      color: c.color, accent: c.accent,
+      grade: c.grade || 0, complete: c.complete || 0,
+      units: (c.units || []).map(u => ({
+        id: u.id, name: u.name, complete: u.complete || 0,
+        assignments: (u.assignments || []).map(a => ({
+          id: a.id, name: a.name, due: a.due || '',
+          status: a.status, cat: a.category,
+          earned: a.earned || 0, total: a.total || 10,
+          desc: a.description || '',
+          submissionText: a.submission_text || '',
+          submissionLink: a.submission_link || '',
+        }))
+      }))
+    }));
+    if (data.settings && data.settings.cf_name) S.name = data.settings.cf_name;
+  } catch (e) {
+    console.warn('Could not reach database — running offline', e);
+  }
+}
+
+async function init() {
+  await loadData();
+  renderName();
+  renderSidebarClasses();
+  renderStreakDays();
+  renderDashboard();
+  renderGradeFilters();
+  updateDate();
+  if (!S.name) setTimeout(() => showEditNameModal(true), 400);
+}
+
+function updateDate() {
+  document.getElementById('dashDate').textContent = todayStr();
+}
+
+// ═══════════════════════════════════════════
+// NAME
+// ═══════════════════════════════════════════
+function renderName() {
+  const display = S.name || 'Set your name';
+  const initials = S.name ? S.name.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '?';
+  document.getElementById('sidebarName').textContent = display;
+  document.getElementById('sidebarAvatar').textContent = initials;
+  document.getElementById('sidebarRole').textContent = `Click to edit · ${S.mode==='teacher'?'Teacher':'Student'} Mode`;
+
+  const greet = document.getElementById('dashGreeting');
+  if(S.name) {
+    greet.textContent = `${greeting()}, ${S.name.split(' ')[0]}! 👋`;
+  } else {
+    greet.textContent = 'Welcome to CourseForge 👋';
+  }
+}
+
+function showEditNameModal(isFirst) {
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-title">${isFirst ? '👋 Welcome! What\'s your name?' : '✏️ Edit Your Name'}</div>
+    ${isFirst ? '<div style="font-size:13.5px; color:var(--text-mid); margin-bottom:18px; line-height:1.5">This will appear on your dashboard and throughout LearnFlow.</div>' : ''}
+    <div class="form-group">
+      <div class="form-label">Your Name</div>
+      <input class="input" id="nameInput" placeholder="e.g. Alex Kim" value="${S.name}" autofocus onkeydown="if(event.key==='Enter')saveName()">
+    </div>
+    <div style="display:flex; gap:9px; margin-top:6px">
+      <button class="btn btn-primary" onclick="saveName()">Save Name</button>
+      ${!isFirst ? '<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' : ''}
+    </div>
+  `;
+  openModal();
+  setTimeout(() => document.getElementById('nameInput')?.focus(), 50);
+}
+
+function saveName() {
+  const val = document.getElementById('nameInput').value.trim();
+  if(!val) { notify('⚠ Please enter your name'); return; }
+  S.name = val;
+  api('POST', '/settings', { cf_name: val });
+  renderName();
+  closeModal();
+  notify('✅ Name saved!');
+}
+
+// ═══════════════════════════════════════════
+// MODE
+// ═══════════════════════════════════════════
+function setMode(mode) {
+  S.mode = mode;
+  document.getElementById('btnStudent').className = 'mode-btn ' + (mode==='student' ? 'active-s' : '');
+  document.getElementById('btnTeacher').className = 'mode-btn ' + (mode==='teacher' ? 'active-t' : '');
+  document.getElementById('sidebarRole').textContent = `Click to edit · ${mode==='teacher'?'Teacher':'Student'} Mode`;
+  document.getElementById('addClassBtn').style.display = mode==='teacher' ? 'inline-flex' : 'none';
+  renderDashboard();
+  if(S.view === 'assignment') renderAssignPage();
+  if(S.view === 'course') renderCoursePage();
+  if(S.view === 'unit') renderUnitPage();
+  notify(mode==='teacher' ? '🎓 Teacher Mode active' : '📚 Student Mode active');
+}
+
+// ═══════════════════════════════════════════
+// SIDEBAR CLASSES
+// ═══════════════════════════════════════════
+function renderSidebarClasses() {
+  const el = document.getElementById('sidebarClasses');
+  el.innerHTML = COURSES.length
+    ? COURSES.map(c => `
+        <div class="sidebar-class" onclick="showView('course','${c.id}')">
+          <span class="drag-handle" style="font-size:12px" title="Drag to reorder" onclick="event.stopPropagation()">⠿</span>
+          <div class="sidebar-dot" style="background:${c.accent}"></div>
+          <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${c.name}</span>
+        </div>
+      `).join('')
+    : `<div style="padding:6px 20px; font-size:12px; color:var(--text-light); font-style:italic">No classes yet</div>`;
+  if(COURSES.length > 1) makeDraggable(el, '.sidebar-class', COURSES, () => {
+    api('POST', '/courses/reorder', { ids: COURSES.map(c=>c.id) });
+    renderSidebarClasses(); renderDashClasses(); renderProgressBars();
+  });
+}
+
+// ═══════════════════════════════════════════
+// STREAK
+// ═══════════════════════════════════════════
+function renderStreakDays() {
+  const labels = ['M','T','W','T','F','S','S'];
+  const today = new Date().getDay(); // 0=Sun
+  // map to Mon-based index
+  const todayIdx = today === 0 ? 6 : today - 1;
+  document.getElementById('streakDays').innerHTML = labels.map((d,i) => {
+    const cls = i === todayIdx ? 'sd-today' : i < todayIdx ? 'sd-done' : 'sd-future';
+    const icon = i === todayIdx ? '·' : i < todayIdx ? '✓' : '';
+    return `<div class="streak-day"><div class="streak-day-lbl">${d}</div><div class="streak-dot ${cls}">${icon}</div></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════
+function renderDashboard() {
+  renderDashStat();
+  renderDashClasses();
+  renderUpcomingList();
+  renderMissingList();
+  renderProgressBars();
+  renderMissingAlerts();
+  renderWeeklySummary();
+}
+
+function renderDashStat() {
+  const all = allAssignments();
+  const completed = all.filter(a=>a.status==='completed');
+  const missing = all.filter(a=>a.status==='missing');
+
+  if(COURSES.length === 0) {
+    document.getElementById('overallGrade').textContent = '—';
+    document.getElementById('overallSub').textContent = 'No classes yet';
+    document.getElementById('statusVal').innerHTML = '<span style="color:var(--text-light)">—</span>';
+    document.getElementById('statusSub').textContent = 'Add classes to get started';
+    document.getElementById('streakVal').textContent = '0';
+    return;
+  }
+
+  const avg = Math.round(COURSES.reduce((s,c)=>s+c.grade,0)/COURSES.length);
+  document.getElementById('overallGrade').textContent = avg + '%';
+  document.getElementById('overallSub').textContent = letterGrade(avg) + ' across ' + COURSES.length + ' class' + (COURSES.length!==1?'es':'');
+
+  const submitted = all.filter(a=>a.status==='submitted');
+  if(S.mode === 'teacher' && submitted.length > 0) {
+    document.getElementById('statusVal').innerHTML = `<span style="color:#1e40af">📤 ${submitted.length} to Grade</span>`;
+    document.getElementById('statusSub').textContent = 'Submissions awaiting your grade';
+  } else if(missing.length > 0) {
+    document.getElementById('statusVal').innerHTML = `<span style="color:var(--danger)">⚠ ${missing.length} Missing</span>`;
+    document.getElementById('statusSub').textContent = 'Needs immediate attention';
+  } else {
+    document.getElementById('statusVal').innerHTML = `<span style="color:var(--success)">✓ On Track</span>`;
+    document.getElementById('statusSub').textContent = 'No missing assignments';
+  }
+}
+
+function renderDashClasses() {
+  const el = document.getElementById('classesList');
+  if(COURSES.length === 0) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        <div class="empty-title">No classes yet</div>
+        <div class="empty-sub">Switch to <strong>Teacher Mode</strong> to add your first class.</div>
+        <button class="btn btn-primary btn-sm" onclick="setMode('teacher'); document.getElementById('addClassBtn').click()">+ Add First Class</button>
+      </div>`;
+    return;
+  }
+  el.innerHTML = COURSES.map(c => `
+    <div class="class-row" onclick="showView('course','${c.id}')">
+      <span class="drag-handle" title="Drag to reorder">⠿</span>
+      <div class="class-icon" style="background:${c.color}">${c.emoji}</div>
+      <div style="flex:1">
+        <div style="font-size:14px; font-weight:700">${c.name}</div>
+        <div style="display:flex; align-items:center; gap:6px; margin-top:4px">
+          <div class="progress-bar" style="width:80px; margin:0; height:5px; display:inline-block; vertical-align:middle">
+            <div class="progress-fill" style="width:${c.complete}%; background:${c.accent}"></div>
+          </div>
+          <span style="font-size:11.5px; color:var(--text-light)">${c.complete}% done</span>
+        </div>
+      </div>
+      <div style="font-size:18px; font-weight:900; color:${c.accent}">${c.grade > 0 ? c.grade + '%' : '—'}</div>
+    </div>
+  `).join('');
+  makeDraggable(el, '.class-row', COURSES, () => {
+    api('POST', '/courses/reorder', { ids: COURSES.map(c=>c.id) });
+    renderDashClasses(); renderSidebarClasses(); renderProgressBars();
+  });
+}
+
+function renderUpcomingList() {
+  const items = allAssignments().filter(a=>a.status==='upcoming')
+    .sort((a,b)=>a.due.localeCompare(b.due)).slice(0,5);
+  document.getElementById('upcomingList').innerHTML = items.length
+    ? items.map(a => `
+        <div class="assign-item" onclick="openAssign('${a.courseId}','${a.unitId}','${a.id}')">
+          <div class="assign-dot dot-upcoming"></div>
+          <div style="flex:1">
+            <div class="assign-name">${a.name}</div>
+            <div class="assign-meta">${a.courseName} · Due ${fmtDate(a.due)}</div>
+          </div>
+          <div style="font-size:12px; font-weight:700; color:var(--text-light)">${a.total} pts</div>
+        </div>
+      `).join('')
+    : `<div class="empty-state" style="padding:20px">
+        <div style="font-size:28px">📋</div>
+        <div style="font-size:13px; color:var(--text-light); margin-top:8px">No upcoming assignments</div>
+      </div>`;
+}
+
+function renderMissingList() {
+  const items = allAssignments().filter(a=>a.status==='missing');
+  document.getElementById('missingList').innerHTML = items.length
+    ? items.map(a => `
+        <div class="assign-item missing" onclick="openAssign('${a.courseId}','${a.unitId}','${a.id}')">
+          <div class="assign-dot dot-missing"></div>
+          <div style="flex:1">
+            <div class="assign-name">⚠ ${a.name}</div>
+            <div class="assign-meta">${a.courseName} · Was due ${fmtDate(a.due)}</div>
+          </div>
+          <div style="font-size:12px; font-weight:700; color:var(--danger)">0/${a.total}</div>
+        </div>
+      `).join('')
+    : `<div class="empty-state" style="padding:20px">
+        <div style="font-size:28px">🎉</div>
+        <div style="font-size:13px; color:var(--text-light); margin-top:8px">No missing assignments!</div>
+      </div>`;
+}
+
+function renderMissingAlerts() {
+  const items = allAssignments().filter(a=>a.status==='missing');
+  document.getElementById('missingAlerts').innerHTML = items.map(a => `
+    <div style="font-size:11.5px; padding:6px 10px; background:white; border-radius:7px; display:flex; justify-content:space-between; border:1px solid #fca5a5">
+      <span>⚠ ${a.name}</span>
+      <span style="color:var(--danger); font-weight:800">0/${a.total} pts</span>
+    </div>
+  `).join('');
+}
+
+function switchAssignTab(tab, btn) {
+  document.querySelectorAll('#view-dashboard .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('upcomingList').style.display = tab==='upcoming'?'block':'none';
+  document.getElementById('missingList').style.display = tab==='missing'?'block':'none';
+}
+
+function renderProgressBars() {
+  const el = document.getElementById('progressBars');
+  if(COURSES.length === 0) {
+    el.innerHTML = `<div class="empty-state" style="padding:16px 0"><div style="font-size:13px; color:var(--text-light)">No courses to display</div></div>`;
+    return;
+  }
+  el.innerHTML = COURSES.map(c => `
+    <div style="margin-bottom:15px">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px">
+        <div style="font-size:13.5px; font-weight:700">${c.emoji} ${c.name}</div>
+        <div style="font-size:12px; font-weight:800; color:${c.accent}">${c.complete}%</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${c.complete}%; background:${c.accent}"></div></div>
+      <div style="font-size:11px; color:var(--text-light); margin-top:2px">Grade: ${c.grade > 0 ? c.grade + '% (' + letterGrade(c.grade) + ')' : 'No grades yet'}</div>
+    </div>
+  `).join('');
+}
+
+function renderWeeklySummary() {
+  const all = allAssignments();
+  const comp = all.filter(a=>a.status==='completed').length;
+  const miss = all.filter(a=>a.status==='missing').length;
+  const up = all.filter(a=>a.status==='upcoming').length;
+  const total = comp + miss;
+  const pct = total > 0 ? Math.round(comp/total*100) : 0;
+  document.getElementById('weeklySummary').innerHTML = `
+    <div class="summary-item"><div class="summary-num" style="color:var(--success)">${comp}</div><div class="summary-lbl">Completed</div></div>
+    <div class="summary-item"><div class="summary-num" style="color:var(--danger)">${miss}</div><div class="summary-lbl">Missing</div></div>
+    <div class="summary-item"><div class="summary-num" style="color:var(--warning)">${up}</div><div class="summary-lbl">Upcoming</div></div>
+    <div class="summary-item"><div class="summary-num" style="color:var(--purple-accent)">${total>0?pct+'%':'—'}</div><div class="summary-lbl">Completion</div></div>
+  `;
+}
+
+// ═══════════════════════════════════════════
+// COURSE PAGE
+// ═══════════════════════════════════════════
+function renderCoursePage() {
+  const c = getCourse(S.courseId); if(!c) return;
+  const allA = c.units.flatMap(u=>u.assignments);
+  const done = allA.filter(a=>a.status==='completed').length;
+  const miss = allA.filter(a=>a.status==='missing').length;
+  const up = allA.filter(a=>a.status==='upcoming').length;
+  document.getElementById('coursePage').innerHTML = `
+    <div style="display:flex; align-items:center; gap:16px; margin-bottom:22px">
+      <div style="width:56px; height:56px; border-radius:16px; background:${c.color}; font-size:28px; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow)">${c.emoji}</div>
+      <div>
+        <div class="page-title">${c.name}</div>
+        <div class="page-sub">${c.grade > 0 ? c.grade + '% · ' + letterGrade(c.grade) + ' · ' : ''}${done}/${allA.length} assignments done</div>
+      </div>
+      ${S.mode==='teacher' ? `
+        <div style="margin-left:auto; display:flex; gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="showAddUnitModal('${c.id}')">+ Add Unit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCourse('${c.id}')">Delete Class</button>
+        </div>` : ''}
+    </div>
+    <div class="g21">
+      <div class="card">
+        <div class="card-title">Units</div>
+        ${c.units.length ? `<div id="unitsList" style="display:flex; flex-direction:column; gap:10px">${c.units.map(u=>renderUnitCard(u,c)).join('')}</div>`
+          : `<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">No units yet</div><div class="empty-sub">Switch to Teacher Mode to add units.</div></div>`}
+      </div>
+      <div>
+        <div class="card mb16" style="text-align:center; padding:24px 20px">
+          <div style="font-size:56px; font-weight:900; color:${c.accent}; letter-spacing:-2px">${c.grade > 0 ? c.grade + '%' : '—'}</div>
+          <div style="font-size:14px; color:var(--text-mid); font-weight:700; margin-top:4px">${c.grade > 0 ? letterGrade(c.grade) : 'No grades yet'}</div>
+          ${c.grade > 0 ? `<div class="progress-bar" style="margin-top:12px"><div class="progress-fill" style="width:${c.grade}%; background:${c.accent}"></div></div>` : ''}
+        </div>
+        <div class="card">
+          <div class="card-title">Quick Stats</div>
+          ${[['Completed ✓',done,'var(--success)'],['Missing ⚠',miss,'var(--danger)'],['Upcoming →',up,'var(--warning)']].map(([l,v,col])=>`
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 12px; border-radius:10px; background:var(--bg); margin-bottom:7px">
+              <span style="font-size:13px; font-weight:700">${l}</span>
+              <span style="font-size:22px; font-weight:900; color:${col}">${v}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderUnitCard(u, c) {
+  const done = u.assignments.filter(a=>a.status==='completed').length;
+  return `
+    <div class="unit-item">
+      <div class="unit-header" onclick="showView('unit','${c.id}','${u.id}')">
+        <span class="drag-handle" title="Drag to reorder" onclick="event.stopPropagation()">⠿</span>
+        <div style="flex:1; margin-left:6px">
+          <div style="font-size:13.5px; font-weight:700">${u.name}</div>
+          <div style="font-size:11.5px; color:var(--text-light); margin-top:3px">${done}/${u.assignments.length} done</div>
+          <div class="progress-bar" style="width:140px; margin-top:6px">
+            <div class="progress-fill" style="width:${u.complete}%; background:${c.accent}"></div>
+          </div>
+        </div>
+        <div style="font-size:12px; color:var(--text-light); font-weight:700; margin-right:8px">${u.complete}%</div>
+        ${S.mode==='teacher' ? `<button class="btn btn-danger btn-sm" style="margin-right:8px; font-size:11px; padding:4px 10px" onclick="event.stopPropagation(); deleteUnit('${c.id}','${u.id}')">Delete</button>` : ''}
+        <div style="color:var(--text-light); font-size:18px">›</div>
+      </div>
+    </div>
+  `;
+}
+
+function initUnitsDrag(c) {
+  const el = document.getElementById('unitsList');
+  if(el) makeDraggable(el, '.unit-item', c.units, () => {
+    api('POST', '/units/reorder', { ids: c.units.map(u=>u.id) });
+    renderCoursePage(); initUnitsDrag(c);
+  });
+}
+
+function saveAssignFields(cid, uid, aid) {
+  const a = getAssign(cid, uid, aid);
+  if(!a) return;
+  api('PUT', '/assignments/' + aid, { name:a.name, due:a.due, category:a.cat, total:a.total, description:a.desc });
+  const c = getCourse(cid); recalcGrade(c);
+  notify('✅ Assignment saved!');
+}
+
+function deleteCourse(cid) {
+  const idx = COURSES.findIndex(c=>c.id===cid);
+  if(idx !== -1) COURSES.splice(idx, 1);
+  api('DELETE', '/courses/' + cid);
+  renderSidebarClasses();
+  renderDashboard();
+  renderGradeFilters();
+  showView('dashboard');
+  notify('🗑 Class removed');
+}
+
+function deleteUnit(cid, uid) {
+  const c = getCourse(cid);
+  const idx = c.units.findIndex(u=>u.id===uid);
+  if(idx !== -1) c.units.splice(idx, 1);
+  api('DELETE', '/units/' + uid);
+  recalcGrade(c);
+  renderCoursePage();
+  notify('🗑 Unit removed');
+}
+
+// ═══════════════════════════════════════════
+// UNIT PAGE
+// ═══════════════════════════════════════════
+function renderUnitPage() {
+  const c = getCourse(S.courseId); const u = getUnit(S.courseId, S.unitId);
+  if(!c||!u) return;
+  document.getElementById('unitBackBtn').onclick = () => showView('course');
+  document.getElementById('unitPage').innerHTML = `
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
+      <span style="font-size:26px">${c.emoji}</span>
+      <div>
+        <div style="font-size:12px; color:var(--text-light)">${c.name}</div>
+        <div class="page-title" style="font-size:22px">${u.name}</div>
+      </div>
+      ${S.mode==='teacher' ? `<button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="showAddAssignModal('${c.id}','${u.id}')">+ Add Assignment</button>` : ''}
+    </div>
+    <div class="tab-list mb16">
+      <button class="tab-btn active" onclick="unitFilter('all',this)">All</button>
+      <button class="tab-btn" onclick="unitFilter('completed',this)">Completed</button>
+      <button class="tab-btn" onclick="unitFilter('missing',this)">Missing</button>
+      <button class="tab-btn" onclick="unitFilter('upcoming',this)">Upcoming</button>
+    </div>
+    <div class="card"><div id="unitAssigns">${unitAssignsHTML(u,c,'all')}</div></div>
+  `;
+}
+
+function unitFilter(f, btn) {
+  document.querySelectorAll('#unitPage .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const c = getCourse(S.courseId); const u = getUnit(S.courseId, S.unitId);
+  document.getElementById('unitAssigns').innerHTML = unitAssignsHTML(u,c,f);
+  if(f === 'all') initAssignDrag(u, c);
+}
+
+function initAssignDrag(u, c) {
+  const el = document.getElementById('unitAssigns');
+  if(el) makeDraggable(el, '.assign-item', u.assignments, () => {
+    api('POST', '/assignments/reorder', { ids: u.assignments.map(a=>a.id) });
+    document.getElementById('unitAssigns').innerHTML = unitAssignsHTML(u, c, 'all');
+    initAssignDrag(u, c);
+  });
+}
+
+function unitAssignsHTML(u, c, filter) {
+  let items = filter==='all' ? u.assignments : u.assignments.filter(a=>a.status===filter);
+  if(!items.length) return `
+    <div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">${filter==='all' ? 'No assignments yet' : 'No ' + filter + ' assignments'}</div>
+      ${filter==='all' && S.mode==='teacher' ? '<div class="empty-sub">Click "+ Add Assignment" to create one.</div>' : ''}
+    </div>`;
+  return items.map(a => `
+    <div class="assign-item ${a.status==='missing'?'missing':''}" onclick="openAssign('${c.id}','${u.id}','${a.id}')">
+      <span class="drag-handle" title="Drag to reorder" onclick="event.stopPropagation()">⠿</span>
+      <div class="assign-dot ${dotClass(a.status)}"></div>
+      <div style="flex:1">
+        <div class="assign-name">${a.name}</div>
+        <div style="display:flex; gap:8px; align-items:center; margin-top:4px">
+          <span class="badge ${statusClass(a.status)}">${a.status}</span>
+          <span style="font-size:11.5px; color:var(--text-light)">${a.cat} · Due ${fmtDate(a.due)}</span>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:14px; font-weight:800; color:${a.status==='completed'?'var(--success)':a.status==='missing'?'var(--danger)':a.status==='submitted'?'#3b82f6':'var(--text-light)'}">
+          ${a.status==='completed'?a.earned+'/'+a.total:a.status==='missing'?'0/'+a.total:a.status==='submitted'?'📤':'–/'+a.total}
+        </div>
+        <div style="font-size:11px; color:var(--text-light)">pts</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════
+// ASSIGNMENT PAGE
+// ═══════════════════════════════════════════
+function renderAssignPage() {
+  const c = getCourse(S.courseId);
+  const u = getUnit(S.courseId, S.unitId);
+  const a = getAssign(S.courseId, S.unitId, S.assignId);
+  if(!a) return;
+  const isT = S.mode==='teacher';
+  const pct = a.status==='completed' ? Math.round(a.earned/a.total*100) : null;
+
+  document.getElementById('assignPage').innerHTML = `
+    <div class="g21">
+      <div>
+        <div class="card mb16">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:16px">
+            <div style="flex:1">
+              ${isT ? `<input class="input" value="${a.name}" style="font-size:20px; font-weight:900; border:none; padding:0; background:transparent; color:var(--text)" oninput="updateA('${a.id}','name',this.value)">` : `<div style="font-size:22px; font-weight:900">${a.name}</div>`}
+              <div style="display:flex; gap:7px; margin-top:9px; flex-wrap:wrap">
+                <span class="badge ${statusClass(a.status)}">${a.status}</span>
+                <span class="badge b-purple">${a.cat}</span>
+                <span class="badge" style="background:${c.color}; color:${c.accent}">${c.emoji} ${c.name}</span>
+              </div>
+            </div>
+            <div style="text-align:right; flex-shrink:0">
+              <div style="font-size:32px; font-weight:900; color:${a.status==='completed'?'var(--success)':a.status==='missing'?'var(--danger)':a.status==='submitted'?'#3b82f6':'var(--text-light)'}; letter-spacing:-1px">
+                ${a.status==='completed'?a.earned:a.status==='missing'?0:'–'}/${a.total}
+              </div>
+              <div style="font-size:11.5px; color:var(--text-light)">points${pct!==null?' ('+pct+'%)':''}</div>
+            </div>
+          </div>
+          <div class="g2">
+            <div>
+              <div class="form-label">Due Date</div>
+              ${isT ? `<input type="date" class="input" value="${a.due}" oninput="updateA('${a.id}','due',this.value)">` : `<div style="font-size:14px; font-weight:700">${fmtDate(a.due)}</div>`}
+            </div>
+            <div>
+              <div class="form-label">Category</div>
+              ${isT ? `<select class="input" oninput="updateA('${a.id}','cat',this.value)">
+                ${['Homework','Quiz','Test','Essay','Lab','Project'].map(x=>`<option ${x===a.cat?'selected':''}>${x}</option>`).join('')}
+              </select>` : `<div style="font-size:14px; font-weight:700">${a.cat}</div>`}
+            </div>
+          </div>
+          ${isT ? `
+          <div class="divider"></div>
+          <div class="g2">
+            <div>
+              <div class="form-label">Total Points</div>
+              <input type="number" class="input" value="${a.total}" min="0" oninput="updateA('${a.id}','total',+this.value)">
+            </div>
+            <div>
+              <div class="form-label">Late Penalty</div>
+              <select class="input">
+                <option>No Penalty</option>
+                <option selected>−10% per day</option>
+                <option>−25% flat</option>
+                <option>−50% flat</option>
+                <option>Zero if late</option>
+              </select>
+            </div>
+          </div>` : ''}
+        </div>
+
+        <div class="card mb16">
+          <div class="card-title">Instructions</div>
+          ${isT ? `<textarea class="input textarea" oninput="updateA('${a.id}','desc',this.value)">${a.desc}</textarea>` : `<div style="font-size:13.5px; line-height:1.65; color:var(--text-mid)">${a.desc || 'No instructions added yet.'}</div>`}
+        </div>
+
+        ${isT ? `
+        <div class="card mb16">
+          <div class="card-title">Attachments & Links</div>
+          <div class="attach-zone" onclick="notify('📎 File upload ready')">📎 Click to attach files or resources</div>
+          <input class="input" placeholder="Paste a Google Doc, Slides, or external link…" style="margin-top:10px">
+          <div style="display:flex; gap:8px; margin-top:14px">
+            <button class="btn btn-primary" onclick="saveAssignFields('${S.courseId}','${S.unitId}','${a.id}')">Save Changes</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteAssign('${S.courseId}','${S.unitId}','${a.id}')">Delete Assignment</button>
+          </div>
+        </div>
+        ${a.status === 'submitted' ? `
+        <div class="card" style="border:2px solid #93c5fd; background:#EFF6FF">
+          <div class="card-title" style="color:#1e40af">Student Submission</div>
+          ${a.submissionText ? `<div style="font-size:13.5px; line-height:1.65; color:var(--text-mid); background:white; border-radius:9px; padding:12px; margin-bottom:12px">${a.submissionText}</div>` : '<div style="font-size:13px; color:var(--text-light); margin-bottom:12px">No text response.</div>'}
+          ${a.submissionLink ? `<div style="font-size:13px; color:#1e40af; margin-bottom:12px">🔗 <a href="${a.submissionLink}" target="_blank" style="color:#1e40af">${a.submissionLink}</a></div>` : ''}
+          <div class="divider"></div>
+          <div class="form-label">Points Earned (out of ${a.total})</div>
+          <div style="display:flex; gap:9px; align-items:center; margin-top:6px">
+            <input id="gradeEarned_${a.id}" type="number" class="input" style="max-width:120px" placeholder="0" min="0" max="${a.total}" value="${a.earned}">
+            <button class="btn btn-primary" onclick="gradeAssign('${S.courseId}','${S.unitId}','${a.id}')">Mark as Graded</button>
+          </div>
+        </div>
+        ` : a.status === 'completed' ? `
+        <div class="card" style="border:2px solid var(--success); background:var(--success-light)">
+          <div class="card-title" style="color:#065f46">Graded</div>
+          <div style="font-size:22px; font-weight:900; color:var(--success)">${a.earned}/${a.total} pts</div>
+          <div style="font-size:13px; color:#065f46; margin-top:4px">${Math.round(a.earned/a.total*100)}% — ${letterGrade(Math.round(a.earned/a.total*100))}</div>
+        </div>
+        ` : ''}
+        ` : `
+        <div class="card">
+          <div class="card-title">Submit Assignment</div>
+          ${a.status==='completed' ? `
+            <div style="text-align:center; padding:20px">
+              <div style="font-size:52px">✅</div>
+              <div style="font-size:18px; font-weight:900; margin:10px 0 4px">Graded!</div>
+              <div style="font-size:14px; color:var(--text-light)">Score: ${a.earned}/${a.total} pts (${pct}%)</div>
+            </div>
+          ` : a.status==='submitted' ? `
+            <div style="text-align:center; padding:20px">
+              <div style="font-size:52px">📤</div>
+              <div style="font-size:18px; font-weight:900; margin:10px 0 4px; color:#1e40af">Submitted!</div>
+              <div style="font-size:14px; color:var(--text-light)">Your teacher will grade this soon.</div>
+              ${a.submissionText ? `<div style="margin-top:14px; text-align:left; background:#EFF6FF; border-radius:9px; padding:12px; font-size:13px; color:var(--text-mid)">${a.submissionText}</div>` : ''}
+              ${a.submissionLink ? `<div style="margin-top:8px; text-align:left; font-size:12px; color:#1e40af">🔗 ${a.submissionLink}</div>` : ''}
+            </div>
+          ` : `
+            ${a.status==='missing' ? `<div style="padding:10px 14px; background:var(--danger-light); border-radius:9px; font-size:13px; color:var(--danger); font-weight:600; margin-bottom:14px">⚠ Missing — late penalty will apply. Submit now to minimize point loss.</div>` : ''}
+            <div class="form-group">
+              <div class="form-label">Text Response</div>
+              <textarea id="submitText_${a.id}" class="input textarea" placeholder="Type your response here…"></textarea>
+            </div>
+            <div class="form-group">
+              <div class="form-label">Or paste a link</div>
+              <input id="submitLink_${a.id}" class="input" placeholder="Google Docs, Slides, Canva…">
+            </div>
+            <button class="btn btn-primary" onclick="submitAssign('${S.courseId}','${S.unitId}','${a.id}')">Submit Assignment</button>
+          `}
+        </div>
+        `}
+      </div>
+
+      <div>
+        <div class="card mb16">
+          <div class="card-title">Grade Impact</div>
+          <div style="font-size:13.5px; line-height:1.6; color:var(--text-mid)">
+            ${a.status==='missing' ? `<div style="color:var(--danger); font-weight:800; margin-bottom:8px">⚠ Missing</div>This is worth <strong>${a.total} pts</strong>. Every day it's missing, you lose more to late penalties. Submit now.` :
+              a.status==='completed' ? `<div style="color:var(--success); font-weight:800; margin-bottom:8px">✓ Done</div>You earned <strong>${a.earned}/${a.total} pts</strong> — ${pct}%. ${pct>=90?'Excellent!':pct>=80?'Good work.':'Room to improve.'}` :
+              a.status==='submitted' ? `<div style="color:#1e40af; font-weight:800; margin-bottom:8px">📤 Submitted</div>Awaiting your teacher's grade. Worth <strong>${a.total} pts</strong>.` :
+              `Worth <strong>${a.total} pts</strong> toward your ${c.name} grade. Submit on time to avoid penalties.`}
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Location</div>
+          <div style="font-size:13.5px; font-weight:700; margin-bottom:4px">${u.name}</div>
+          <div style="font-size:12px; color:var(--text-light)">${c.name}</div>
+          <button class="btn btn-secondary btn-sm" style="margin-top:11px; width:100%" onclick="showView('unit')">View Full Unit</button>
+          <button class="btn btn-secondary btn-sm" style="margin-top:7px; width:100%" onclick="showView('course')">View Course</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+const _saveT = {};
+function updateA(aid, field, val) {
+  COURSES.forEach(c => c.units.forEach(u => {
+    const a = u.assignments.find(x=>x.id===aid);
+    if(a) a[field] = val;
+  }));
+  // Debounce DB write so fast typing doesn't spam the server
+  clearTimeout(_saveT[aid]);
+  _saveT[aid] = setTimeout(() => {
+    const dbField = field === 'cat' ? 'category' : field === 'desc' ? 'description' : field;
+    api('PUT', '/assignments/' + aid, { [dbField]: val });
+  }, 600);
+}
+
+function submitAssign(cid, uid, aid) {
+  const a = getAssign(cid, uid, aid);
+  if(!a) return;
+  const textEl = document.getElementById('submitText_' + aid);
+  const linkEl = document.getElementById('submitLink_' + aid);
+  const text = textEl ? textEl.value.trim() : '';
+  const link = linkEl ? linkEl.value.trim() : '';
+  a.status = 'submitted';
+  a.earned = 0;
+  a.submissionText = text;
+  a.submissionLink = link;
+  api('PUT', '/assignments/' + aid, { status: 'submitted', earned: 0, submission_text: text, submission_link: link });
+  renderAssignPage();
+  renderDashboard();
+  notify('📤 Assignment submitted — awaiting grade!');
+}
+
+function gradeAssign(cid, uid, aid) {
+  const a = getAssign(cid, uid, aid);
+  if(!a) return;
+  const earnedEl = document.getElementById('gradeEarned_' + aid);
+  const earned = earnedEl ? parseFloat(earnedEl.value) : 0;
+  if(isNaN(earned) || earned < 0) { notify('⚠ Enter a valid points value'); return; }
+  a.status = 'completed';
+  a.earned = earned;
+  api('PUT', '/assignments/' + aid, { status: 'completed', earned });
+  const c = getCourse(cid);
+  recalcGrade(c);
+  renderAssignPage();
+  renderDashboard();
+  notify('✅ Assignment graded!');
+}
+
+function deleteAssign(cid, uid, aid) {
+  const u = getUnit(cid, uid);
+  const idx = u.assignments.findIndex(a=>a.id===aid);
+  if(idx !== -1) u.assignments.splice(idx, 1);
+  api('DELETE', '/assignments/' + aid);
+  const c = getCourse(cid); recalcGrade(c);
+  showView('unit');
+  renderDashboard();
+  notify('🗑 Assignment removed');
+}
+
+function recalcGrade(c) {
+  const all = c.units.flatMap(u=>u.assignments).filter(a=>a.status==='completed');
+  if(!all.length) { c.grade = 0; c.complete = 0; }
+  else {
+    const earned = all.reduce((s,a)=>s+a.earned,0);
+    const total  = all.reduce((s,a)=>s+a.total,0);
+    c.grade = total > 0 ? Math.round(earned/total*100) : 0;
+  }
+  const allA = c.units.flatMap(u=>u.assignments);
+  const doneCount = allA.filter(a=>a.status==='completed').length;
+  c.complete = allA.length > 0 ? Math.round(doneCount/allA.length*100) : 0;
+  api('PUT', '/courses/' + c.id, { grade: c.grade, complete: c.complete });
+}
+
+// ═══════════════════════════════════════════
+// GRADES
+// ═══════════════════════════════════════════
+function renderGradeFilters() {
+  document.getElementById('gradeFilters').innerHTML = `
+    <button class="btn btn-secondary btn-sm" onclick="gradeFilter('all',this)" style="border-color:var(--mint-accent); background:var(--mint-light)">All Classes</button>
+    ${COURSES.map(c=>`<button class="btn btn-secondary btn-sm" onclick="gradeFilter('${c.id}',this)" style="border-color:${c.accent}">${c.emoji} ${c.name}</button>`).join('')}
+  `;
+}
+
+function gradeFilter(f, btn) {
+  S.gradeFilter = f;
+  document.querySelectorAll('#gradeFilters .btn').forEach(b=>{b.style.background=''; b.style.fontWeight='700';});
+  if(btn) { btn.style.background='var(--mint-light)'; }
+  renderGrades();
+}
+
+function renderGrades() {
+  const all = allAssignments();
+  const items = S.gradeFilter==='all' ? all : all.filter(a=>a.courseId===S.gradeFilter);
+
+  if(items.length === 0) {
+    document.getElementById('gradesBody').innerHTML = '';
+    document.getElementById('gradesEmpty').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📊</div>
+        <div class="empty-title">No assignments yet</div>
+        <div class="empty-sub">Switch to Teacher Mode and add classes, units, and assignments to see grades here.</div>
+      </div>`;
+  } else {
+    document.getElementById('gradesEmpty').innerHTML = '';
+    document.getElementById('gradesBody').innerHTML = items.map(a => `
+      <tr class="${a.status==='missing'?'miss-row':''}" onclick="openAssign('${a.courseId}','${a.unitId}','${a.id}')">
+        <td style="font-weight:600">${a.name}</td>
+        <td><span style="font-size:12px; color:var(--text-light)">${a.courseEmoji} ${a.courseName}</span></td>
+        <td><span class="badge b-purple" style="font-size:11px">${a.cat}</span></td>
+        <td><span class="badge ${statusClass(a.status)}">${a.status}</span></td>
+        <td style="font-weight:800; color:${a.status==='completed'?'var(--success)':a.status==='missing'?'var(--danger)':a.status==='submitted'?'#3b82f6':'var(--text-light)'}">
+          ${a.status==='completed'?a.earned+'/'+a.total:a.status==='missing'?'0/'+a.total:a.status==='submitted'?'Pending':'–/'+a.total}
+        </td>
+      </tr>
+    `).join('');
+  }
+  renderCatBreakdown(items);
+  renderGPABreakdown();
+}
+
+function renderCatBreakdown(items) {
+  const cats = {};
+  items.filter(a=>a.status==='completed').forEach(a=>{
+    if(!cats[a.cat]) cats[a.cat]={e:0,t:0};
+    cats[a.cat].e += a.earned; cats[a.cat].t += a.total;
+  });
+  document.getElementById('catBreakdown').innerHTML = Object.keys(cats).length
+    ? Object.entries(cats).map(([cat,{e,t}])=>{
+        const p=Math.round(e/t*100);
+        return `
+          <div style="margin-bottom:11px">
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px">
+              <span style="font-weight:700">${cat}</span>
+              <span style="color:var(--text-light)">${e}/${t} (${p}%)</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:linear-gradient(90deg,var(--mint-accent),var(--purple-accent))"></div></div>
+          </div>`;
+      }).join('')
+    : `<div style="color:var(--text-light); font-size:13px">No completed assignments</div>`;
+}
+
+function renderGPABreakdown() {
+  document.getElementById('gpaBreakdown').innerHTML = COURSES.length
+    ? COURSES.map(c=>`
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--border)">
+          <div style="font-size:13.5px; font-weight:700">${c.emoji} ${c.name}</div>
+          <div style="font-size:16px; font-weight:900; color:${c.accent}">${c.grade > 0 ? c.grade + '%' : '—'}</div>
+        </div>`).join('')
+    : `<div style="color:var(--text-light); font-size:13px">No classes yet</div>`;
+}
+
+// ═══════════════════════════════════════════
+// PLANNER
+// ═══════════════════════════════════════════
+function renderPlanner() {
+  const now = new Date();
+  // Build week starting from Monday of current week
+  const dayOfWeek = now.getDay(); // 0=Sun
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + mondayOffset);
+
+  const weekDays = Array.from({length:7}, (_,i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return {
+      name: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i],
+      date: d,
+      isToday: d.toDateString() === now.toDateString(),
+      dateStr: d.toLocaleDateString('en-US',{month:'numeric',day:'numeric'}),
+      isoDate: d.toISOString().split('T')[0],
+    };
+  });
+
+  const fmt = (d) => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  document.getElementById('plannerWeekLabel').textContent =
+    `Week of ${fmt(weekDays[0].date)} – ${fmt(weekDays[6].date)}, ${now.getFullYear()}`;
+
+  // Gather assignments due this week
+  const assignments = allAssignments();
+  const byDay = {};
+  weekDays.forEach(d => {
+    byDay[d.isoDate] = assignments.filter(a => a.due === d.isoDate);
+  });
+
+  const accs = ['#E0FAF0','#EEF0FF','#FFF5E8','#FFF0F8','#F5F0FF'];
+
+  document.getElementById('plannerGrid').innerHTML = weekDays.map(day => `
+    <div class="planner-day ${day.isToday?'today-day':''}">
+      <div class="planner-day-head">
+        <div style="font-weight:900">${day.name}</div>
+        <div style="font-size:10px; opacity:0.8">${day.dateStr}</div>
+        ${day.isToday ? '<div style="font-size:10px; font-weight:800; margin-top:1px">TODAY</div>' : ''}
+      </div>
+      <div class="planner-body">
+        ${(byDay[day.isoDate]||[]).map((a,i)=>{
+          const k = day.isoDate+'_'+a.id;
+          const done = S.plannerDone[k];
+          const isMiss = a.status==='missing';
+          const c = getCourse(a.courseId);
+          const bg = isMiss ? 'var(--danger-light)' : (c ? c.color : accs[i%accs.length]);
+          return `
+            <div class="planner-pill" style="background:${bg}" onclick="togglePlanner('${k}',event)">
+              <div class="planner-cb ${done?'chk':''}">${done?'✓':''}</div>
+              <span style="${done?'text-decoration:line-through;opacity:0.5':''}; line-height:1.3; font-size:11px">${a.name}${isMiss?' ⚠':''}</span>
+            </div>`;
+        }).join('')}
+        ${(byDay[day.isoDate]||[]).length === 0 ? '<div style="font-size:11px; color:var(--text-light); text-align:center; margin-top:12px; opacity:0.6">Free</div>' : ''}
+        ${S.mode==='teacher' ? `<div style="font-size:11px; color:var(--text-light); text-align:center; padding:4px; border:1px dashed var(--border); border-radius:6px; cursor:pointer; margin-top:4px" onclick="notify('Open a class to add assignments')">+ Add</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function togglePlanner(k, e) {
+  e.stopPropagation();
+  S.plannerDone[k] = !S.plannerDone[k];
+  renderPlanner();
+}
+
+// ═══════════════════════════════════════════
+// AI CHAT — 4 hardcoded example interactions
+// ═══════════════════════════════════════════
+const CHAT_EXAMPLES = [
+  {
+    user: "I forgot to submit my lab report that was due yesterday",
+    ai: `That assignment is now <strong>Missing — 0 pts</strong> counted against your grade.<br><br>
+📉 Your class grade has dropped. Every day it stays missing costs more to late penalty.<br>
+🔥 Your streak is at risk if you don't submit something today.<br><br>
+Submitting now (even late) is always better than leaving it at zero. The sooner you submit, the less you lose.<br><br>
+<strong>Open the assignment and submit now?</strong>`,
+    label: '— Tenet 1: Accountability Over Convenience'
+  },
+  {
+    user: "Add a quiz for next Friday worth 20 points to my Math class",
+    ai: `Done! Here's what I added:<br><br>
+📌 <strong>Math Quiz</strong><br>
+📅 Due: next Friday<br>
+💯 Points: <strong>20</strong> · Category: Quiz<br><br>
+It's now showing in your Weekly Planner and Upcoming Assignments. Want to add a description or late penalty?`,
+    label: '— Tenet 7: Fast Input, Fast Feedback'
+  },
+  {
+    user: "How am I doing across all my classes?",
+    ai: `Here's your snapshot across all classes:<br><br>
+📊 <strong>Overall:</strong> Calculated from all graded assignments<br>
+✅ Completed assignments count toward your grade<br>
+⚠ Missing assignments are dragging your grade down<br>
+→ Upcoming assignments are your next priorities<br><br>
+Focus on clearing any <strong>missing work first</strong> — those are guaranteed lost points. Then look at what's due soonest.<br><br>
+Want me to show you your most urgent assignment?`,
+    label: '— Tenet 2: Clarity Over Complexity'
+  },
+  {
+    user: "Will I break my streak today if I don't do anything?",
+    ai: `Yes — your streak resets at midnight if you don't submit.<br><br>
+Check your <strong>Upcoming</strong> tab for assignments due today. The fastest win is any assignment without a late penalty — submitting it keeps your streak alive with zero cost.<br><br>
+If you have missing work, submitting that counts too. Any submission today saves your streak.<br><br>
+<strong>Open your planner to see today's tasks?</strong>`,
+    label: '— Tenet 6: Consistency Builds Momentum'
+  }
+];
+
+function renderChat() {
+  const c = document.getElementById('chatMsgs');
+  addBubble(c, 'ai', `👋 Hi${S.name ? ', ' + S.name.split(' ')[0] : ''}! I'm your AI Tutor — I track your grades, flag missing work, and help you plan.<br><br>Below are <strong>4 example conversations</strong> showing what I can do. Then try asking me anything!`);
+
+  CHAT_EXAMPLES.forEach(pair => {
+    addBubble(c, 'user', pair.user);
+    addBubble(c, 'ai', pair.ai);
+    if(pair.label) {
+      const lbl = document.createElement('div');
+      lbl.className = 'chat-example-label';
+      lbl.textContent = pair.label;
+      c.appendChild(lbl);
+    }
+  });
+
+  const sep = document.createElement('div');
+  sep.style.cssText = 'text-align:center; font-size:12px; color:var(--text-light); padding:12px 0 4px; font-style:italic';
+  sep.textContent = '── Your turn — ask me anything ──';
+  c.appendChild(sep);
+  c.scrollTop = c.scrollHeight;
+}
+
+function addBubble(container, role, html) {
+  const wrap = document.createElement('div');
+  wrap.className = `chat-msg ${role}-msg`;
+  const av = document.createElement('div');
+  av.className = `chat-av ${role==='ai'?'av-ai':'av-user'}`;
+  av.textContent = role==='ai' ? '🤖' : '👤';
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.innerHTML = html;
+  wrap.appendChild(av); wrap.appendChild(bubble);
+  container.appendChild(wrap);
+}
+
+function sendChat() {
+  const inp = document.getElementById('chatInp');
+  const text = inp.value.trim(); if(!text) return;
+  const c = document.getElementById('chatMsgs');
+  addBubble(c, 'user', text);
+  inp.value = '';
+
+  const typing = document.createElement('div');
+  typing.className = 'chat-msg ai-msg';
+  typing.innerHTML = `<div class="chat-av av-ai">🤖</div><div class="chat-bubble"><div style="display:flex;gap:5px;padding:4px 0"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div></div>`;
+  c.appendChild(typing);
+  c.scrollTop = c.scrollHeight;
+
+  setTimeout(() => {
+    typing.remove();
+    addBubble(c, 'ai', aiResponse(text.toLowerCase()));
+    c.scrollTop = c.scrollHeight;
+  }, 900 + Math.random()*400);
+}
+
+function aiResponse(t) {
+  const all = allAssignments();
+  const miss = all.filter(a=>a.status==='missing');
+  const up = all.filter(a=>a.status==='upcoming').sort((a,b)=>a.due.localeCompare(b.due));
+
+  if(t.includes('miss') || t.includes('forgot') || t.includes('late') || t.includes('behind')) {
+    return miss.length
+      ? `You have <strong>${miss.length} missing assignment${miss.length>1?'s':''}:</strong><br><br>${miss.map(a=>`⚠ <strong>${a.name}</strong> (${a.courseName}) — 0/${a.total} pts`).join('<br>')}<br><br>Submit these now — even with a late penalty, something is better than zero.`
+      : `No missing assignments right now — you're all caught up! ✅ Keep it up.`;
+  }
+  if(t.includes('grade') || t.includes('how am i') || t.includes('doing')) {
+    return COURSES.length
+      ? `Your current grades:<br><br>${COURSES.map(c=>`${c.emoji} <strong>${c.name}</strong> — ${c.grade>0?c.grade+'% ('+letterGrade(c.grade)+')':'No grades yet'}`).join('<br>')}${miss.length?`<br><br>⚠ You have <strong>${miss.length} missing assignment${miss.length>1?'s':''}</strong> dragging your grade down. Address those first.`:''}`
+      : `No classes added yet. Switch to <strong>Teacher Mode</strong> to set up your classes, then I can track your grades.`;
+  }
+  if(t.includes('streak')) {
+    return up.length
+      ? `To protect your streak, submit something today. Your most urgent upcoming assignment is <strong>${up[0].name}</strong> (${up[0].courseName}, due ${fmtDate(up[0].due)}). Open it and submit before midnight.`
+      : `No upcoming assignments right now. Make sure you don't have any missing work — those count against you too.`;
+  }
+  if(t.includes('today') || t.includes('urgent') || t.includes('due')) {
+    const today = new Date().toISOString().split('T')[0];
+    const dueToday = all.filter(a=>a.due===today && a.status!=='completed');
+    return dueToday.length
+      ? `Due <strong>today:</strong><br><br>${dueToday.map(a=>`${a.status==='missing'?'⚠':'📋'} <strong>${a.name}</strong> (${a.courseName}) — ${a.total} pts`).join('<br>')}<br><br>Submit these before midnight to protect your streak.`
+      : `Nothing due today. Your next upcoming assignment is ${up.length ? `<strong>${up[0].name}</strong> (${up[0].courseName}) due ${fmtDate(up[0].due)}` : 'not set yet'}.`;
+  }
+  if(t.includes('plan') || t.includes('week') || t.includes('schedule')) {
+    return up.length
+      ? `Your next ${Math.min(up.length,3)} upcoming assignments:<br><br>${up.slice(0,3).map(a=>`📅 <strong>${a.name}</strong> (${a.courseName}) — due ${fmtDate(a.due)}`).join('<br>')}<br><br>Check the <strong>Planner</strong> tab for a full week view.`
+      : `No upcoming assignments scheduled. Add assignments in Teacher Mode to populate your planner.`;
+  }
+  if(t.includes('add') || t.includes('create')) {
+    return S.mode==='teacher'
+      ? `To add an assignment: navigate to a class → open a unit → click <strong>"+ Add Assignment"</strong>. You can set the name, due date, points, and category. Want me to walk you through it?`
+      : `Only teachers can add assignments. Click the <strong>Teacher</strong> toggle in the sidebar to switch modes.`;
+  }
+  if(t.includes('help') || t.includes('what can')) {
+    return `I can help with:<br><br>📊 <strong>Grades</strong> — "How am I doing?"<br>⚠ <strong>Missing work</strong> — "What am I missing?"<br>🔥 <strong>Streak</strong> — "Will I break my streak?"<br>📅 <strong>Schedule</strong> — "What's due this week?"<br>➕ <strong>Adding work</strong> — "How do I add an assignment?"<br><br>What do you need?`;
+  }
+  return miss.length
+    ? `Your most urgent action right now: <strong>${miss[0].name}</strong> (${miss[0].courseName}) is missing — 0/${miss[0].total} pts. Submitting it, even late, stops the bleeding. Want me to open it?`
+    : up.length
+      ? `You're in good shape — no missing work. Next up: <strong>${up[0].name}</strong> in ${up[0].courseName}, due ${fmtDate(up[0].due)}. Stay ahead of it!`
+      : `You're all caught up! Add more classes and assignments in Teacher Mode to get started.`;
+}
+
+// ═══════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════
+function showAddClassModal() {
+  const colorOptions = [
+    {color:'#E0FAF0', accent:'#10B981', label:'Mint'},
+    {color:'#EEF0FF', accent:'#6366F1', label:'Indigo'},
+    {color:'#FFF5E8', accent:'#F59E0B', label:'Amber'},
+    {color:'#FFF0F8', accent:'#EC4899', label:'Pink'},
+    {color:'#F5F0FF', accent:'#8B5CF6', label:'Purple'},
+    {color:'#FFF0F0', accent:'#EF4444', label:'Red'},
+  ];
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-title">+ Add New Class</div>
+    <div class="form-group">
+      <div class="form-label">Class Name</div>
+      <input class="input" id="mClassName" placeholder="e.g. AP Biology" autofocus onkeydown="if(event.key==='Enter')doAddClass()">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Emoji</div>
+      <input class="input" id="mClassEmoji" placeholder="🔬" maxlength="2">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Color</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap" id="colorPicker">
+        ${colorOptions.map((o,i)=>`
+          <div onclick="selectColor(${i})" id="colorOpt${i}" style="width:36px; height:36px; border-radius:10px; background:${o.color}; border:2.5px solid ${i===0?o.accent:'var(--border)'}; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s"
+            data-color="${o.color}" data-accent="${o.accent}">
+            <div style="width:14px; height:14px; border-radius:50%; background:${o.accent}"></div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex; gap:9px; margin-top:18px">
+      <button class="btn btn-primary" onclick="doAddClass()">Add Class</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  `;
+  openModal();
+  setTimeout(() => document.getElementById('mClassName')?.focus(), 50);
+}
+
+let selectedColorIdx = 0;
+function selectColor(i) {
+  const opts = document.querySelectorAll('#colorPicker > div');
+  opts.forEach((el,j) => {
+    el.style.borderColor = j===i ? el.dataset.accent : 'var(--border)';
+  });
+  selectedColorIdx = i;
+}
+
+function showAddUnitModal(cid) {
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-title">+ Add Unit</div>
+    <div class="form-group">
+      <div class="form-label">Unit Name</div>
+      <input class="input" id="mUnitName" placeholder="e.g. Unit 1: Cell Biology" autofocus onkeydown="if(event.key==='Enter')doAddUnit('${cid}')">
+    </div>
+    <div style="display:flex; gap:9px; margin-top:18px">
+      <button class="btn btn-primary" onclick="doAddUnit('${cid}')">Add Unit</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  `;
+  openModal();
+  setTimeout(() => document.getElementById('mUnitName')?.focus(), 50);
+}
+
+function showAddAssignModal(cid, uid) {
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-title">+ Add Assignment</div>
+    <div class="form-group">
+      <div class="form-label">Name</div>
+      <input class="input" id="mAName" placeholder="Assignment name" autofocus onkeydown="if(event.key==='Enter')doAddAssign('${cid}','${uid}')">
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px">
+      <div><div class="form-label">Due Date</div><input type="date" class="input" id="mADate"></div>
+      <div><div class="form-label">Points</div><input type="number" class="input" id="mAPoints" placeholder="10" min="0"></div>
+    </div>
+    <div class="form-group">
+      <div class="form-label">Category</div>
+      <select class="input" id="mACat">
+        ${['Homework','Quiz','Test','Essay','Lab','Project'].map(x=>`<option>${x}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <div class="form-label">Instructions (optional)</div>
+      <textarea class="input" id="mADesc" style="height:70px" placeholder="Describe the assignment…"></textarea>
+    </div>
+    <div style="display:flex; gap:9px; margin-top:6px">
+      <button class="btn btn-primary" onclick="doAddAssign('${cid}','${uid}')">Add Assignment</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  `;
+  openModal();
+  setTimeout(() => document.getElementById('mAName')?.focus(), 50);
+}
+
+function doAddClass() {
+  const name = document.getElementById('mClassName').value.trim();
+  const emoji = document.getElementById('mClassEmoji').value.trim() || '📓';
+  if(!name) { notify('⚠ Enter a class name'); return; }
+  const opts = document.querySelectorAll('#colorPicker > div');
+  const sel = opts[selectedColorIdx] || opts[0];
+  const color = sel.dataset.color;
+  const accent = sel.dataset.accent;
+  const newCourse = { id:'c'+Date.now(), name, emoji, color, accent, grade:0, complete:0, units:[] };
+  COURSES.push(newCourse);
+  api('POST', '/courses', { id:newCourse.id, name, emoji, color, accent });
+  selectedColorIdx = 0;
+  renderSidebarClasses(); renderDashboard(); renderGradeFilters();
+  closeModal(); notify('✅ "'+name+'" added!');
+}
+
+function doAddUnit(cid) {
+  const name = document.getElementById('mUnitName').value.trim();
+  if(!name) { notify('⚠ Enter a unit name'); return; }
+  const newUnit = { id:'u'+Date.now(), name, complete:0, assignments:[] };
+  getCourse(cid).units.push(newUnit);
+  api('POST', '/units', { id:newUnit.id, course_id:cid, name });
+  closeModal(); renderCoursePage(); notify('✅ Unit added!');
+}
+
+function doAddAssign(cid, uid) {
+  const name  = document.getElementById('mAName').value.trim();
+  const due   = document.getElementById('mADate').value || new Date(Date.now()+7*86400000).toISOString().split('T')[0];
+  const total = parseInt(document.getElementById('mAPoints').value)||10;
+  const cat   = document.getElementById('mACat').value;
+  const desc  = document.getElementById('mADesc').value.trim();
+  if(!name) { notify('⚠ Enter an assignment name'); return; }
+  const newA = { id:'a'+Date.now(), name, due, status:'upcoming', cat, earned:0, total, desc };
+  getUnit(cid, uid).assignments.push(newA);
+  api('POST', '/assignments', { id:newA.id, unit_id:uid, name, due, status:'upcoming', category:cat, earned:0, total, description:desc });
+  const c = getCourse(cid); recalcGrade(c);
+  closeModal(); renderUnitPage(); renderDashboard(); notify('✅ "'+name+'" added!');
+}
+
+function openModal() {
+  document.getElementById('modalOverlay').style.display = 'block';
+  document.getElementById('modalBox').style.display = 'block';
+}
+function closeModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  document.getElementById('modalBox').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════════
+let _di = null; // dragged index
+let _da = null; // dragged array reference
+
+function makeDraggable(containerEl, selector, arr, onDone) {
+  const items = Array.from(containerEl.querySelectorAll(selector));
+  if(items.length < 2) return;
+
+  items.forEach((el, i) => {
+    el.setAttribute('draggable', 'true');
+
+    el.addEventListener('dragstart', e => {
+      _di = i; _da = arr;
+      e.dataTransfer.effectAllowed = 'move';
+      // defer class add so browser captures pre-fade snapshot
+      requestAnimationFrame(() => el.classList.add('dragging'));
+    });
+
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      items.forEach(x => x.classList.remove('drag-over'));
+      _di = null; _da = null;
+    });
+
+    el.addEventListener('dragover', e => {
+      e.preventDefault();
+      if(_da !== arr) return;
+      items.forEach(x => x.classList.remove('drag-over'));
+      if(i !== _di) el.classList.add('drag-over');
+    });
+
+    el.addEventListener('dragleave', e => {
+      if(!el.contains(e.relatedTarget)) el.classList.remove('drag-over');
+    });
+
+    el.addEventListener('drop', e => {
+      e.preventDefault(); e.stopPropagation();
+      if(_di === null || _da !== arr || _di === i) return;
+      const moved = arr.splice(_di, 1)[0];
+      arr.splice(i, 0, moved);
+      _di = null; _da = null;
+      onDone();
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
