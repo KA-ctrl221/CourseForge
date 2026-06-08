@@ -25,23 +25,24 @@ def get_data():
         
         # Load Courses, Units, and Assignments
         courses = []
-        courses_ref = db.collection('courses').order_by('sort_ord').stream()
+        # Fix: Convert stream to list immediately to prevent nested gRPC deadlock
+        courses_docs = list(db.collection('courses').order_by('sort_ord').stream())
         
-        for c_doc in courses_ref:
+        for c_doc in courses_docs:
             c = c_doc.to_dict()
             c['id'] = c_doc.id
             c['units'] = []
             
-            # Fetch units for this course
-            units_ref = db.collection('units').where('course_id', '==', c_doc.id).order_by('sort_ord').stream()
-            for u_doc in units_ref:
+            # Fix: Convert stream to list immediately
+            units_docs = list(db.collection('units').where('course_id', '==', c_doc.id).order_by('sort_ord').stream())
+            for u_doc in units_docs:
                 u = u_doc.to_dict()
                 u['id'] = u_doc.id
                 
-                # Fetch assignments for this unit
-                assignments_ref = db.collection('assignments').where('unit_id', '==', u_doc.id).order_by('sort_ord').stream()
+                # Fix: Convert stream to list immediately
+                assignments_docs = list(db.collection('assignments').where('unit_id', '==', u_doc.id).order_by('sort_ord').stream())
                 u['assignments'] = []
-                for a_doc in assignments_ref:
+                for a_doc in assignments_docs:
                     a = a_doc.to_dict()
                     a['id'] = a_doc.id
                     u['assignments'].append(a)
@@ -95,10 +96,10 @@ def update_course(cid):
 
 @app.route('/api/courses/<cid>', methods=['DELETE'])
 def delete_course(cid):
-    # Delete connected assignments and units
-    units = db.collection('units').where('course_id', '==', cid).stream()
+    # Fix: Convert stream to list immediately to prevent deletion deadlocks
+    units = list(db.collection('units').where('course_id', '==', cid).stream())
     for u in units:
-        assignments = db.collection('assignments').where('unit_id', '==', u.id).stream()
+        assignments = list(db.collection('assignments').where('unit_id', '==', u.id).stream())
         for a in assignments:
             db.collection('assignments').document(a.id).delete()
         db.collection('units').document(u.id).delete()
@@ -136,7 +137,7 @@ def update_unit(uid):
 
 @app.route('/api/units/<uid>', methods=['DELETE'])
 def delete_unit(uid):
-    assignments = db.collection('assignments').where('unit_id', '==', uid).stream()
+    assignments = list(db.collection('assignments').where('unit_id', '==', uid).stream())
     for a in assignments:
         db.collection('assignments').document(a.id).delete()
     db.collection('units').document(uid).delete()
